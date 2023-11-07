@@ -51,6 +51,13 @@ async function run() {
       res.send(result)
     })
 
+    app.post('/foodItem',async(req,res)=>{
+      const newFood= req.body
+      console.log(newFood)
+      const result =await foodCollection.insertOne(newFood)
+      res.send(result)
+    })
+
   
 
     // Send a ping to confirm a successful connection
