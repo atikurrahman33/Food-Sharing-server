@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const port = process.env.PORT || 4000;
 
@@ -36,6 +36,23 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result)
     })
+
+
+    app.get('/foodItem/:id', async(req,res)=>{
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id)}
+      const options = {
+        // Sort matched documents in descending order by rating
+        
+        // Include only the `title` and `imdb` fields in the returned document
+        projection: {  name:1, quantity: 1,location: 1,expiration_date: 1,food_image: 1,donator_name: 1 },
+      };
+      const result =await foodCollection.findOne(query ,options);
+      res.send(result)
+    })
+
+  
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
