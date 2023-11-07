@@ -60,16 +60,17 @@ async function run() {
     })
 
 
-    app.get('/foodItem', async (req, res) => {
+    app.get('/myFoodItem', async (req, res) => {
       console.log(req.query);
       let query = {};
       if (req.query?.email) {
-        query = { email: req.query.email }
+        query = { email: req.query.email };
       }
       const cursor = foodCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
     });
+    
 
 
 
@@ -104,11 +105,33 @@ async function run() {
       res.send(result)
     })
 
+  //  request
     app.post('/reqFoodItem',async(req,res)=>{
       const newFood= req.body
       console.log(newFood)
       const result =await reqFoodItem.insertOne(newFood)
       res.send(result)
+    })
+
+    app.get('/reqFoodItem', async (req, res) => {
+      console.log(req.query);
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email }
+      }
+      const cursor = reqFoodItem.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+   
+
+    app.delete('/reqFoodItem/:id', async(req, res) => {
+      const id= req.params.id
+      console.log('delete id',id)
+      const query = {_id:new ObjectId(id)  };
+      const result = await reqFoodItem.deleteOne(query);
+      res.send(result);    
     })
 
 
