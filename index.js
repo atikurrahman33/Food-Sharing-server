@@ -124,7 +124,14 @@ async function run() {
       res.send(result);
     });
 
-   
+    // http://localhost:4000/reqFoodItem/654a550a750926c535b7d83b
+    app.get('/reqFoodItem/:id', async(req, res) => {
+      const id= req.params.id
+      
+      const query = {_id:new ObjectId(id)  };
+      const result = await reqFoodItem.findOne(query);
+      res.send(result);    
+    })
 
     app.delete('/reqFoodItem/:id', async(req, res) => {
       const id= req.params.id
