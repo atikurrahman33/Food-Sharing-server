@@ -28,6 +28,7 @@ async function run() {
     await client.connect();
 
     const foodCollection = client.db("foodSharing").collection("foodItem");
+    const reqFoodItem = client.db("foodSharing").collection("reqFoodItem");
   
 
 
@@ -45,7 +46,7 @@ async function run() {
         // Sort matched documents in descending order by rating
         
         // Include only the `title` and `imdb` fields in the returned document
-        projection: {  name:1, quantity: 1,location: 1,expiration_date: 1,food_image: 1,donator_name: 1 },
+        projection: {  name:1, quantity: 1,location: 1,expiration_date: 1,food_image: 1,donator_name: 1,donator_email: 1 },
       };
       const result =await foodCollection.findOne(query ,options);
       res.send(result)
@@ -100,6 +101,13 @@ async function run() {
       }
 
       const result = await userCollection.updateOne(filter, cars, options);
+      res.send(result)
+    })
+
+    app.post('/reqFoodItem',async(req,res)=>{
+      const newFood= req.body
+      console.log(newFood)
+      const result =await reqFoodItem.insertOne(newFood)
       res.send(result)
     })
 
