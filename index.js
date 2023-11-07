@@ -70,37 +70,41 @@ async function run() {
       res.send(result);
     });
 
-    app.get('/foodItem/ascending', async (req, res) => {
-      console.log(req.query);
-      let query = {};
-      if (req.query?.email) {
-        query = { email: req.query.email }
-      }
-      const cursor = foodCollection.find(query).sort({expiration_date: 1});
-      const result = await cursor.toArray();
-      res.send(result);
-    })
 
-    app.get('/foodItem/descending', async (req, res) => {
-      console.log(req.query);
-      let query = {};
-      if (req.query?.email) {
-        query = { email: req.query.email }
-      }
-      const cursor = foodCollection.find(query).sort({expiration_date: -1});
-      const result = await cursor.toArray();
-      res.send(result);
-    })
 
     app.delete('/foodItem/:id', async(req, res) => {
       const id= req.params.id
       console.log('delete id',id)
       const query = {_id:new ObjectId(id)  };
       const result = await foodCollection.deleteOne(query);
-      res.send(result);
-
-    
+      res.send(result);    
     })
+
+    app.patch('/foodItem/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedFood = req.body;
+      console.log(updatedFood);
+      const cars = {
+        $set: {
+          name: updatedFood.name,
+          food_image: updatedFood.food_image,
+          location: updatedFood.location,
+          quantity: updatedFood.quantity,
+          note: updatedFood.note,
+          expiration_date:updatedFood.expiration_date,
+
+
+        }
+      }
+
+      const result = await userCollection.updateOne(filter, cars, options);
+      res.send(result)
+    })
+
+
+  
 
 
   
