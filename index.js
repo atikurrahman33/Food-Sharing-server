@@ -58,6 +58,51 @@ async function run() {
       res.send(result)
     })
 
+
+    app.get('/foodItem', async (req, res) => {
+      console.log(req.query);
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email }
+      }
+      const cursor = foodCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get('/foodItem/ascending', async (req, res) => {
+      console.log(req.query);
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email }
+      }
+      const cursor = foodCollection.find(query).sort({expiration_date: 1});
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    app.get('/foodItem/descending', async (req, res) => {
+      console.log(req.query);
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email }
+      }
+      const cursor = foodCollection.find(query).sort({expiration_date: -1});
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    app.delete('/foodItem/:id', async(req, res) => {
+      const id= req.params.id
+      console.log('delete id',id)
+      const query = {_id:new ObjectId(id)  };
+      const result = await foodCollection.deleteOne(query);
+      res.send(result);
+
+    
+    })
+
+
   
 
     // Send a ping to confirm a successful connection
