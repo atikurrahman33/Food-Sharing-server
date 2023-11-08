@@ -46,7 +46,7 @@ async function run() {
         // Sort matched documents in descending order by rating
         
         // Include only the `title` and `imdb` fields in the returned document
-        projection: {  name:1, quantity: 1,location: 1,expiration_date: 1,food_image: 1,donator_name: 1,donator_email: 1 },
+        projection: {  name:1, quantity: 1,location: 1,expiration_date: 1,food_image: 1,donator_name: 1,email: 1 },
       };
       const result =await foodCollection.findOne(query ,options);
       res.send(result)
@@ -64,13 +64,12 @@ async function run() {
       console.log(req.query);
       let query = {};
       if (req.query?.email) {
-        query = { email: req.query.email };
+        query = { email: req.query.email }
       }
       const cursor = foodCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
     });
-    
 
 
 
@@ -86,22 +85,20 @@ async function run() {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
-      const updatedFood = req.body;
-      console.log(updatedFood);
-      const cars = {
+      const updateFood = req.body;
+      console.log(updateFood);
+      const foods = {
         $set: {
-          name: updatedFood.name,
-          food_image: updatedFood.food_image,
-          location: updatedFood.location,
-          quantity: updatedFood.quantity,
-          note: updatedFood.note,
-          expiration_date:updatedFood.expiration_date,
-
+          name: updateFood.name,
+          food_image: updateFood.food_image,
+          status: updateFood.status,
+          quantity: updateFood.quantity,
+          location: updateFood.location,
 
         }
       }
 
-      const result = await userCollection.updateOne(filter, cars, options);
+      const result = await foodCollection.updateOne(filter, foods, options);
       res.send(result)
     })
 
@@ -124,14 +121,21 @@ async function run() {
       res.send(result);
     });
 
-    // http://localhost:4000/reqFoodItem/654a550a750926c535b7d83b
-    app.get('/reqFoodItem/:id', async(req, res) => {
-      const id= req.params.id
-      
-      const query = {_id:new ObjectId(id)  };
-      const result = await reqFoodItem.findOne(query);
-      res.send(result);    
-    })
+    app.get('/manageFood/:text', async (req, res) => {
+      try {
+          const searchText = req.params.text;
+          const searchResult = await reqFoodItem.find({
+              $or: [
+                  { name: { $regex: searchText, $options: 'i' } }
+              ]
+          }).toArray();
+
+          res.json(searchResult);
+      } catch (error) {
+          console.error("Error searching :", error);
+          res.status(500).json({ error: "Internal server error" });
+      }
+  });
 
     app.delete('/reqFoodItem/:id', async(req, res) => {
       const id= req.params.id
@@ -141,8 +145,26 @@ async function run() {
       res.send(result);    
     })
 
+    app.patch('/foodItem/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateFood = req.body;
+      console.log(updateFood);
+      const foods = {
+        $set: {
+          name: updateFood.name,
+          food_image: updateFood.food_image,
+          status: updateFood.status,
+          quantity: updateFood.quantity,
+          location: updateFood.location,
 
-  
+        }
+      }
+
+      const result = await foodCollection.updateOne(filter, foods, options);
+      res.send(result)
+    })
 
 
   
