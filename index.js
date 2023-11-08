@@ -46,7 +46,7 @@ async function run() {
         // Sort matched documents in descending order by rating
         
         // Include only the `title` and `imdb` fields in the returned document
-        projection: {  name:1, quantity: 1,location: 1,expiration_date: 1,food_image: 1,donator_name: 1,email: 1 },
+        projection: {  name:1,status:1, quantity: 1,location: 1,expiration_date: 1,food_image: 1,donator_name: 1,email: 1 },
       };
       const result =await foodCollection.findOne(query ,options);
       res.send(result)
@@ -145,29 +145,38 @@ async function run() {
       res.send(result);    
     })
 
-    app.patch('/foodItem/:id', async (req, res) => {
+    app.patch('/reqFood/status/:id', async(req, res) => {
       const id = req.params.id;
-      const filter = { _id: new ObjectId(id) };
+      const filter = {_id: new ObjectId(id)};
       const options = { upsert: true };
-      const updateFood = req.body;
-      console.log(updateFood);
-      const foods = {
+      const updateStatus = req.body;
+      console.log(updateStatus);
+      const task = {
         $set: {
-          name: updateFood.name,
-          food_image: updateFood.food_image,
-          status: updateFood.status,
-          quantity: updateFood.quantity,
-          location: updateFood.location,
-
+          status: updateStatus.status,
         }
       }
-
-      const result = await foodCollection.updateOne(filter, foods, options);
-      res.send(result)
+      const result = await reqFoodItem.updateOne(filter, task, options)
+      res.send(result);
     })
 
 
-  
+    app.get('/reqFood/:id', async (req, res) => {
+      try {
+          const id = req.params.id;
+          const query = { _id: new ObjectId(id) };
+          const result = await reqFoodItem.findOne(query);
+
+          if (result) {
+              res.status(200).json(result); // Sending the lecture as JSON response
+          } else {
+              res.status(404).send("not found");
+          }
+      } catch (error) {
+          console.error("Error fetching :", error);
+          res.status(500).send("Internal Server Error");
+      }
+  });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
